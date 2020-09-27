@@ -46,7 +46,7 @@
                 <a href="index.php"><i class="fa fa-fw fa-dashboard"></i> Dashboard</a>
             </li>
             <li>
-                <a href="javascript:;" data-toggle="collapse" data-target="#posts_dropdown"><i class="fa fa-fw fa-arrows-v"></i> Posts <i class="fa fa-fw fa-caret-down"></i></a>
+                <a href="javascript:;" data-toggle="collapse" data-target="#posts_dropdown"><i class="fa fa-fw fa-arrows-v"></i> Posts - admin only <i class="fa fa-fw fa-caret-down"></i></a>
                 <ul id="posts_dropdown" class="collapse">
                     <li>
                         <a href="./posts.php">View All Posts</a>
@@ -57,14 +57,14 @@
                 </ul>
             </li>
             <li>
-                <a href="./categories.php"><i class="fa fa-fw fa-wrench"></i> Categories</a>
+                <a href="./categories.php"><i class="fa fa-fw fa-wrench"></i> Categories - admin only</a>
             </li>
 
             <li class="">
-                <a href="comments.php"><i class="fa fa-fw fa-file"></i>Comments</a>
+                <a href="comments.php"><i class="fa fa-fw fa-file"></i>Comments - admin only</a>
             </li>
             <li>
-                <a href="javascript:;" data-toggle="collapse" data-target="#demo"><i class="fa fa-fw fa-arrows-v"></i> Users <i class="fa fa-fw fa-caret-down"></i></a>
+                <a href="javascript:;" data-toggle="collapse" data-target="#demo"><i class="fa fa-fw fa-arrows-v"></i> Users - admin only <i class="fa fa-fw fa-caret-down"></i></a>
                 <ul id="demo" class="collapse">
                     <li>
                         <a href="./users.php">View All Users</a>
