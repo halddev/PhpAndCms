@@ -157,14 +157,21 @@ if (isset($_GET['reset'])) {
 
             //$query = "SELECT * FROM posts ORDER BY post_id DESC";
 
+            $user = currentUser();
+
             //joining 'posts' and 'categories' tables
-            $query = "SELECT posts.post_id, posts.post_author, posts.post_user, posts.post_title, posts.post_category_id, ";
+            $query  = "SELECT posts.post_id, posts.post_author, posts.post_user, posts.post_title, posts.post_category_id, ";
             $query .= "posts.post_status, posts.post_image, posts.post_tags, posts.post_comment_count, posts.post_date, ";
-            $query .= "posts.post_viewcount, categories.cat_id, categories.cat_title FROM posts ";
-            $query .= "LEFT JOIN categories ON posts.post_category_id = categories.cat_id ORDER BY posts.post_id DESC";
+            $query .= "posts.post_viewcount, categories.cat_id, categories.cat_title "; 
+            $query .= "FROM posts ";
+            $query .= "LEFT JOIN categories ON posts.post_category_id = categories.cat_id ";
+            $query .= "WHERE posts.post_user = '$user' ";  
+            $query .= "ORDER BY posts.post_id DESC ";
+                      
 
 
             $select_posts = mysqli_query($connection, $query);
+            confirmQuery($select_posts);
             while ($row = mysqli_fetch_assoc($select_posts)) {
 
                 $post_id            = $row['post_id'];
@@ -201,7 +208,7 @@ if (isset($_GET['reset'])) {
                 echo "<td>{$post_title}</td>";
                 echo "<td>{$category_title}</td>";
                 echo "<td>{$post_status}</td>";
-                echo "<td><img width='100' src='../images/{$post_image}' alt='image'></td>";
+                echo "<td><img width='100' src='../images/" . imagePlaceholder($post_image) . "' alt='image'></td>";
                 echo "<td>{$post_tags}</td>";
 
                 $query = "SELECT * FROM comments WHERE comment_post_id = $post_id ";

@@ -1,0 +1,19 @@
+{
+    "name": "martin/cms",
+    "authors": [
+        {
+            "name": "Martin Hald",
+            "email": "martinhald_4@hotmail.com"
+        }
+    ],
+
+    "autoload": {
+        "classmap": [
+            "classes"
+        ]
+    },
+
+    "require": {
+        "phpmailer/phpmailer": "^6.1"
+    }
+}

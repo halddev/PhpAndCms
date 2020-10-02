@@ -10,7 +10,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="index.php">CMS Front Page</a>
+            <a class="navbar-brand" href="/cms">CMS Front Page</a>
         </div>
 
 
@@ -28,21 +28,27 @@
 
                     $category_class = '';
 
+                    $login_class = '';
+
                     $registration_class = '';
 
                     //'PHP_SELF' = the page we're on, ie. index.php
                     $pageName = basename($_SERVER['PHP_SELF']);
 
+                    $login = 'login.php';
                     $registration = 'registration.php';
+
                     if (isset($_GET['category']) && $_GET['category'] == $cat_id) {
 
                         $category_class = 'active';
                     } else if ($pageName == $registration) {
                         $registration_class = 'active';
+                    } else if ($pageName == $login) {
+                        $login_class = 'active';
                     }
 
 
-                    echo "<li class='$category_class'><a href='category.php?category={$cat_id}'>{$cat_title}</a></li>";
+                    echo "<li class='$category_class'><a href='/cms/category/{$cat_id}'>{$cat_title}</a></li>";
                 }
                 ?>
             </ul>
@@ -50,27 +56,33 @@
             <!--Right navbar-->
             <ul class="nav navbar-nav navbar-right">
 
-                <!--Edit Post link on post.php-->
-                <?php
-                if (isset($_SESSION['user_role'])) {
+                <!--Edit Post link on post.php - only when logged in -->
+                <?php if (isLoggedIn()) {
                     if (isset($_GET['p_id'])) {
                         $the_post_id = escape($_GET['p_id']);
                 ?>
-                        <li><a href='admin/posts.php?source=edit_post&p_id=<?php echo $the_post_id; ?>'>Edit Post</a></li>
-                <?php                    }
-                }
-                ?>
+                        <li><a href='/cms/admin/posts.php?source=edit_post&p_id=<?php echo $the_post_id; ?>'>Edit Post</a></li>
+                    <?php } ?>
 
-                <?php if (!isset($_SESSION['user_role'])) : ?>
+                    <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] == 'admin') : ?>
+                        <li>
+                            <a href='/cms/admin'>Admin</a>
+                        </li>
+                    <?php endif; ?>
+
+                    <li><a href='/cms/includes/logout.php'>Logout</a></li>
+                <?php } ?>
+
+
+                <?php if (!isLoggedIn()) : ?>
+
                     <li class="<?php echo $registration_class; ?>">
-                        <a href="registration.php">Register</a>
+                        <a href="/cms/registration.php">Register</a>
                     </li>
-                <?php endif; ?>
+                    <li class="<?php echo $login_class; ?>">
+                        <a href="/cms/login.php">Login</a>
+                    </li>
 
-                <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] == 'admin') : ?>
-                    <li>
-                        <a href='admin'>Admin</a>
-                    </li>
                 <?php endif; ?>
 
             </ul>

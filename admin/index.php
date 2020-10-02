@@ -40,13 +40,15 @@
                                 </div>
                             </div>
                         </div>
-                        <a href="posts.php">
-                            <div class="panel-footer">
-                                <span class="pull-left">View Details</span>
-                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
-                                <div class="clearfix"></div>
-                            </div>
-                        </a>
+                        <?php if ($_SESSION['user_role'] = 'admin') { ?>
+                            <a href="posts.php">
+                                <div class="panel-footer">
+                                    <span class="pull-left">View Details</span>
+                                    <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </a>
+                        <?php } ?>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
@@ -62,13 +64,15 @@
                                 </div>
                             </div>
                         </div>
-                        <a href="comments.php">
-                            <div class="panel-footer">
-                                <span class="pull-left">View Details</span>
-                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
-                                <div class="clearfix"></div>
-                            </div>
-                        </a>
+                        <?php if ($_SESSION['user_role'] = 'admin') { ?>
+                            <a href="comments.php">
+                                <div class="panel-footer">
+                                    <span class="pull-left">View Details</span>
+                                    <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </a>
+                        <?php } ?>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
@@ -84,13 +88,15 @@
                                 </div>
                             </div>
                         </div>
-                        <a href="users.php">
-                            <div class="panel-footer">
-                                <span class="pull-left">View Details</span>
-                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
-                                <div class="clearfix"></div>
-                            </div>
-                        </a>
+                        <?php if ($_SESSION['user_role'] = 'admin') { ?>
+                            <a href="users.php">
+                                <div class="panel-footer">
+                                    <span class="pull-left">View Details</span>
+                                    <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </a>
+                        <?php } ?>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
@@ -106,13 +112,15 @@
                                 </div>
                             </div>
                         </div>
-                        <a href="categories.php">
-                            <div class="panel-footer">
-                                <span class="pull-left">View Details</span>
-                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
-                                <div class="clearfix"></div>
-                            </div>
-                        </a>
+                        <?php if ($_SESSION['user_role'] = 'admin') { ?>
+                            <a href="categories.php">
+                                <div class="panel-footer">
+                                    <span class="pull-left">View Details</span>
+                                    <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </a>
+                        <?php } ?>
                     </div>
                 </div>
             </div>

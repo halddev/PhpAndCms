@@ -2,7 +2,55 @@
 
 function redirect($location)
 {
-    return header("Location:" . $location);
+    header("Location:" . $location);
+    exit;
+}
+
+function imagePlaceholder($image=''){
+
+    if(!$image){
+        return 'aaa.jpg';
+    } else {
+        return $image;
+    }
+}
+
+function currentUser(){
+    if(isset($_SESSION['username'])){
+        return $_SESSION['username'];
+    }
+    return false;
+}
+
+//Check for method - ie. 'post' when using forms
+function ifItIsMethod($method = null)
+{
+
+    if ($_SERVER['REQUEST_METHOD'] == strtoupper($method)) {
+        return true;
+    }
+
+    return false;
+}
+
+function isLoggedIn()
+{
+
+    if (isset($_SESSION['user_role'])) {
+
+        return true;
+    }
+
+    return false;
+}
+
+function checkIfUserIsLoggedInAndRedirect($redirectLocation = null)
+{
+
+    if (isLoggedIn()) {
+
+        redirect($redirectLocation);
+    }
 }
 
 function escape($string)
@@ -80,15 +128,19 @@ function insert_categories()
 
             echo "This field must be filled.";
         } else {
-            $query = "INSERT INTO categories(cat_title)";
-            $query .= "VALUE('{$cat_title}') ";
 
-            $create_category_query = mysqli_query($connection, $query);
+            $stmt = mysqli_prepare($connection, "INSERT INTO categories(cat_title) VALUES(?) ");
 
-            if (!$create_category_query) {
+            mysqli_stmt_bind_param($stmt, "s", $cat_title);
+
+            mysqli_stmt_execute($stmt);
+
+
+            if (!$stmt) {
                 die('QUERY FAILED' . mysqli_error($connection));
             }
         }
+        mysqli_stmt_close($stmt);
     }
 }
 
@@ -262,20 +314,22 @@ function login_user($username, $password)
         $db_user_firstname = $row['user_firstname'];
         $db_user_lastname = $row['user_lastname'];
         $db_user_role = $row['user_role'];
+
+        //Successful login:
+        if (password_verify($password, $db_user_password)) {
+
+            $_SESSION['username'] = $db_username;
+            $_SESSION['firstname'] = $db_user_firstname;
+            $_SESSION['lastname'] = $db_user_lastname;
+            $_SESSION['user_role'] = $db_user_role;
+
+            redirect("/cms/admin");
+
+            //Whatever other scenarios may occcur:
+        } else {
+
+            return false;
+        }
     }
-
-    //Successful login
-    if (password_verify($password, $db_user_password)) {
-
-        $_SESSION['username'] = $db_username;
-        $_SESSION['firstname'] = $db_user_firstname;
-        $_SESSION['lastname'] = $db_user_lastname;
-        $_SESSION['user_role'] = $db_user_role;
-
-        redirect("/cms/admin");
-
-        //Whatever other scenarios may occcur.
-    } else {
-        redirect("/cms/index.php");
-    }
+    return true;
 }

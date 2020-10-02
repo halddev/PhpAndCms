@@ -37,22 +37,66 @@
             if (isset($_GET['category'])) {
                 $post_category_id = escape($_GET['category']);
 
-                if (isset($_SESSION['user_role']) && $_SESSION['user_role'] == 'admin') {
+                if (is_admin($_SESSION['username'])) {
 
-                    $query = "SELECT * FROM posts WHERE post_category_id = $post_category_id ";
+                    //Fetching posts using prepared statements
+                    $stmt1 = mysqli_prepare($connection, "SELECT post_id, post_title, post_user, post_date, post_image, 
+                             post_content FROM posts WHERE post_category_id = ?");
                 } else {
-                    $query = "SELECT * FROM posts WHERE post_category_id = $post_category_id AND post_status = 'published' ";
+                    $stmt2 = mysqli_prepare($connection, "SELECT SELECT post_id, post_title, post_user, post_date, 
+                             post_image, post_content FROM posts WHERE post_category_id = ? AND post_status = ? ");
+
+                    $published = 'published';
                 }
 
-                $count_posts_query = mysqli_query($connection, $query);
-                $count = mysqli_num_rows($count_posts_query);
+
+                if (isset($stmt1)) {
+
+                    //bind params in $stmt1, param is of type int (i), and the param is $post_category_id.
+                    mysqli_stmt_bind_param($stmt1, "i", $post_category_id);
+
+                    //executing the statement
+                    mysqli_stmt_execute($stmt1);
+
+                    //Bind the result of the statement to variables
+                    mysqli_stmt_bind_result(
+                        $stmt1,
+                        $post_id,
+                        $post_title,
+                        $post_user,
+                        $post_date,
+                        $post_image,
+                        $post_content
+                    );
+
+                    $stmt = $stmt1;
+                } else {
+                    //2 params, one is type "int", other is "string", hence "is"
+                    mysqli_stmt_bind_param($stmt2, "is", $post_category_id, $published);
+
+                    mysqli_stmt_execute($stmt2);
+
+                    mysqli_stmt_bind_result(
+                        $stmt2,
+                        $post_id,
+                        $post_title,
+                        $post_user,
+                        $post_date,
+                        $post_image,
+                        $post_content
+                    );
+
+                    $stmt = $stmt2;
+                }
+
+                $count = mysqli_stmt_num_rows($stmt);
 
 
                 //-------------------Heading-----------------------------
-               
-                $title_query = "SELECT cat_title FROM categories WHERE cat_id = $post_category_id ";
-                $title_query = mysqli_query($connection, $title_query);
-                $cat_title = mysqli_fetch_assoc($title_query)['cat_title'];
+
+                // $title_query = "SELECT cat_title FROM categories WHERE cat_id = $post_category_id ";
+                // $title_query = mysqli_query($connection, $title_query);
+                // $cat_title = mysqli_fetch_assoc($title_query)['cat_title'];
                 //$cat_title = $row['cat_title'];
             ?>
 
@@ -64,44 +108,39 @@
 
                 <?php
 
-                if ($count < 1) {
+                if ($count === 0) {
                     echo "<h2 class='text-center'>No posts available</h2>";
-                } else {
+                }
 
-                    //Number of pages = number of posts/5 rounded up
-                    $count = ceil($count / $per_page);
+                //Number of pages = number of posts/5 rounded up
+                $count = ceil($count / $per_page);
 
-                    $query .= "ORDER BY post_id DESC LIMIT $page_1, $per_page ";
-                    $show_posts_query = mysqli_query($connection, $query);
+                $query .= "ORDER BY post_id DESC LIMIT $page_1, $per_page ";
+                $show_posts_query = mysqli_query($connection, $query);
 
-                    while ($row = mysqli_fetch_assoc($show_posts_query)) {
-                        $post_id = $row['post_id'];
-                        $post_title = $row['post_title'];
-                        $post_user = $row['post_user'];
-                        $post_date = $row['post_date'];
-                        $post_image = $row['post_image'];
-                        $post_content = substr($row['post_content'], 0, 100);
+                while (mysqli_stmt_fetch($stmt)) :
+
 
                 ?>
 
-                        <!--------Blog Posts------------>
-                        <h2>
-                            <a href="post.php?p_id=<?php echo $post_id; ?>"><?php echo $post_title; ?></a>
-                        </h2>
-                        <p class="lead">
-                            by <a href="author_posts.php?author=<?php echo $post_user; ?>&p_id=<?php echo $post_id; ?>"><?php echo $post_user; ?></a>
-                        </p>
-                        <p><span class="glyphicon glyphicon-time"></span><?php echo $post_date; ?></p>
-                        <hr>
-                        <img class="img-responsive" src="images/<?php echo $post_image; ?>" alt="">
-                        <hr>
-                        <p><?php echo $post_content; ?></p>
-                        <a class="btn btn-primary" href="#">Read More <span class="glyphicon glyphicon-chevron-right"></span></a>
+                    <!--------Blog Posts------------>
+                    <h2>
+                        <a href="post.php?p_id=<?php echo $post_id; ?>"><?php echo $post_title; ?></a>
+                    </h2>
+                    <p class="lead">
+                        by <a href="author_posts.php?author=<?php echo $post_user; ?>&p_id=<?php echo $post_id; ?>"><?php echo $post_user; ?></a>
+                    </p>
+                    <p><span class="glyphicon glyphicon-time"></span><?php echo $post_date; ?></p>
+                    <hr>
+                    <img class="img-responsive" src="/cms/images/<?php echo $post_image; ?>" alt="">
+                    <hr>
+                    <p><?php echo $post_content; ?></p>
+                    <a class="btn btn-primary" href="#">Read More <span class="glyphicon glyphicon-chevron-right"></span></a>
 
-                        <hr>
-
-            <?php }
-                }
+                    <hr>
+            <?php
+                endwhile;
+                mysqli_stmt_close($stmt);//close statement and db connection
             } else {
 
                 header("Location: index.php");
