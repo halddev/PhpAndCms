@@ -35,15 +35,37 @@
             <?php
 
             if (isset($_GET['category'])) {
-                $post_category_id = escape($_GET['category']);
+                $post_category_id = $_GET['category'];
+//-------------------Heading-----------------------------
 
-                if (is_admin($_SESSION['username'])) {
+
+                $title_stmt = mysqli_prepare($connection, "SELECT cat_title FROM categories WHERE cat_id = ?");
+                mysqli_stmt_bind_param($title_stmt, "i", $post_category_id);
+                mysqli_stmt_execute($title_stmt);
+                mysqli_stmt_bind_result(
+                    $title_stmt,
+                    $cat_title
+                );
+                mysqli_stmt_fetch($title_stmt);
+?>
+
+                <h1 class="page-header">
+                    Posts in
+                    <small><?php echo $cat_title; ?></small>
+                </h1>
+<!-------------------Heading end---------------------------->
+
+
+                <?php
+                mysqli_stmt_close($title_stmt);
+
+                if (isset($_SESSION['username']) && is_admin($_SESSION['username'])) {
 
                     //Fetching posts using prepared statements
                     $stmt1 = mysqli_prepare($connection, "SELECT post_id, post_title, post_user, post_date, post_image, 
                              post_content FROM posts WHERE post_category_id = ?");
                 } else {
-                    $stmt2 = mysqli_prepare($connection, "SELECT SELECT post_id, post_title, post_user, post_date, 
+                    $stmt2 = mysqli_prepare($connection, "SELECT post_id, post_title, post_user, post_date, 
                              post_image, post_content FROM posts WHERE post_category_id = ? AND post_status = ? ");
 
                     $published = 'published';
@@ -87,36 +109,28 @@
                     );
 
                     $stmt = $stmt2;
+                    
                 }
 
+                mysqli_stmt_store_result($stmt);
                 $count = mysqli_stmt_num_rows($stmt);
 
 
-                //-------------------Heading-----------------------------
+                
 
-                // $title_query = "SELECT cat_title FROM categories WHERE cat_id = $post_category_id ";
-                // $title_query = mysqli_query($connection, $title_query);
-                // $cat_title = mysqli_fetch_assoc($title_query)['cat_title'];
-                //$cat_title = $row['cat_title'];
-            ?>
-
-                <h1 class="page-header">
-                    Posts in
-                    <small><?php echo $cat_title; ?></small>
-                </h1>
-
+?>
 
                 <?php
 
-                if ($count === 0) {
+                if ($count < 1) {
                     echo "<h2 class='text-center'>No posts available</h2>";
                 }
 
                 //Number of pages = number of posts/5 rounded up
                 $count = ceil($count / $per_page);
 
-                $query .= "ORDER BY post_id DESC LIMIT $page_1, $per_page ";
-                $show_posts_query = mysqli_query($connection, $query);
+                // $query .= "ORDER BY post_id DESC LIMIT $page_1, $per_page ";
+                // $show_posts_query = mysqli_query($connection, $query);
 
                 while (mysqli_stmt_fetch($stmt)) :
 
@@ -132,7 +146,7 @@
                     </p>
                     <p><span class="glyphicon glyphicon-time"></span><?php echo $post_date; ?></p>
                     <hr>
-                    <img class="img-responsive" src="/cms/images/<?php echo $post_image; ?>" alt="">
+                    <img class="img-responsive" src="/cms/images/<?php echo imagePlaceholder($post_image); ?>" alt="">
                     <hr>
                     <p><?php echo $post_content; ?></p>
                     <a class="btn btn-primary" href="#">Read More <span class="glyphicon glyphicon-chevron-right"></span></a>
@@ -162,14 +176,14 @@
 
     <hr>
 
-    <!--Pagination-->
+    <!--Pagination - currently not working -->
     <ul class="pager">
         <?php
         for ($i = 1; $i <= $count; $i++) {
             if ($i == $page) {
-                echo "<li><a class='active_link' href='category.php?category={$post_category_id}&page={$i}'>$i</a></li>";
+                echo "<li><a class='active_link' href='/cms/category/{$post_category_id}/page/{$i}'>$i</a></li>";
             } else {
-                echo "<li><a href='category.php?category={$post_category_id}&page={$i}'>$i</a></li>";
+                echo "<li><a href='/cms/category/{$post_category_id}/page/{$i}'>$i</a></li>";
             }
         }
         ?>
